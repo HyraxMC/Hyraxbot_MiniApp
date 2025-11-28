@@ -46,6 +46,10 @@
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const tg = window.Telegram?.WebApp;
+tg?.ready();
+tg?.expand();
+alert("initData length: " + (tg?.initData?.length || 0));
+      const tg = window.Telegram?.WebApp;
       const banner = document.getElementById("banner");
 
       if (tg && tg.initData && tg.initData.length > 0) {
@@ -70,3 +74,4 @@
   </script>
 </body>
 </html>
+
