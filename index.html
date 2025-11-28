@@ -6,121 +6,362 @@
   <title>HyraxBot Mini App</title>
   <style>
     :root {
-      --bg: #0b1220; --text: #f8fafc; --muted: #94a3b8; --accent: #00c2ff;
-      --glass: rgba(255, 255, 255, 0.10); --border: rgba(255, 255, 255, 0.18);
+      --bg: #f0f4f8;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #00c2ff;
+      --card-glass: rgba(255, 255, 255, 0.22);
+      --border-glass: rgba(255, 255, 255, 0.28);
+      --nav-glass: rgba(255, 255, 255, 0.18);
+      --bg-image: url('day-bg.jpg');
     }
-    * { box-sizing: border-box; }
+    [data-theme="dark"] {
+      --bg: #0b1220;
+      --text: #f7fafc;
+      --muted: #a3a3a3;
+      --accent: #00c2ff;
+      --card-glass: rgba(16, 20, 28, 0.45);
+      --border-glass: rgba(255, 255, 255, 0.16);
+      --nav-glass: rgba(255, 255, 255, 0.12);
+      --bg-image: url('night-bg.jpg');
+    }
+
+    html, body { height: 100%; }
     body {
-      margin: 0; font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-      color: var(--text); background: var(--bg);
-      min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto;
+      margin: 0;
+      font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      background-image: var(--bg-image);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      transition: background 0.4s ease, color 0.3s ease, background-image 0.6s ease;
     }
-    header, nav, .card {
-      background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(12px);
-      border-radius: 16px; box-shadow: 0 10px 28px rgba(0,0,0,0.28);
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--nav-glass);
+      border-bottom: 1px solid var(--border-glass);
+      backdrop-filter: blur(12px) saturate(120%);
     }
-    header { margin: 12px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
-    header .title { font-weight: 800; }
+    header img.logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+    header .titles { display: flex; flex-direction: column; }
+    header .title { font-weight: 800; letter-spacing: 0.2px; }
     header .subtitle { font-size: 12px; color: var(--muted); }
-    main { padding: 12px; display: grid; gap: 12px; grid-template-columns: 1fr; }
-    @media (min-width: 560px) { main { grid-template-columns: 1fr 1fr; } }
-    .card { padding: 14px; }
-    .card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 800; }
-    .card p { margin: 0 0 12px; font-size: 13px; color: var(--muted); }
+
+    .theme-toggle {
+      position: fixed;
+      inset-inline-end: 12px;
+      inset-block-start: 12px;
+      z-index: 10;
+      background: var(--card-glass);
+      color: var(--text);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      padding: 8px 12px;
+      font-weight: 700;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 26px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.3s ease, background 0.3s ease;
+    }
+    .theme-toggle:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+
+    main.section {
+      flex: 1;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      align-content: start;
+    }
+    @media (min-width: 420px) { main.section { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 720px) { main.section { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .card {
+      position: relative;
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.26);
+      backdrop-filter: blur(14px) saturate(130%);
+      overflow: hidden;
+      animation: glassFadeIn 460ms ease both;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -20% -20% auto auto;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(120px 60px at 70% 20%, rgba(255,255,255,0.25), transparent 70%);
+      filter: blur(20px);
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+    .card h3 { margin: 0 0 10px; font-size: 15.5px; font-weight: 800; }
+    .card p { margin: 0 0 12px; font-size: 12.5px; color: var(--muted); }
+
     .btn {
-      appearance: none; background: linear-gradient(135deg, var(--accent), #6be6ff);
-      color: #02131d; border: 0; border-radius: 12px; padding: 10px 14px; font-weight: 800;
-      cursor: pointer; box-shadow: 0 6px 20px rgba(0, 194, 255, 0.35);
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #6be6ff);
+      color: #0b0f14;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      box-shadow: 0 6px 20px rgba(0,194,255,0.35);
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.26s ease, filter 0.2s ease;
     }
-    nav { margin: 12px; padding: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .tab { padding: 10px 12px; border-radius: 12px; text-align: center; font-weight: 700; cursor: pointer; }
-    .tab.active { background: rgba(255,255,255,0.20); }
+    .btn:hover { transform: translateY(-1px) scale(1.04); box-shadow: 0 10px 28px rgba(0,194,255,0.45); filter: saturate(115%); }
+    .btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 5px 18px rgba(0,194,255,0.35); }
+
+    nav.footer {
+      position: sticky;
+      bottom: 0;
+      z-index: 4;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 10px;
+      background: var(--nav-glass);
+      border-top: 1px solid var(--border-glass);
+      backdrop-filter: blur(12px) saturate(120%);
+    }
+    .footer-btn {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid var(--border-glass);
+      color: var(--text);
+      font-weight: 700;
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.22);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: transform 0.18s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+    .footer-btn:hover { transform: translateY(-1px) scale(1.03); background: rgba(255,255,255,0.22); }
+    .footer-btn.active { background: rgba(255,255,255,0.26); box-shadow: 0 12px 34px rgba(0,0,0,0.28); }
+
+    .notify {
+      position: fixed;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 420px;
+      background: var(--card-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: 14px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+      padding: 12px;
+      text-align: center;
+      font-weight: 700;
+      color: var(--text);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .notify.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    .notify .progress { height: 4px; background: var(--accent); border-radius: 4px; margin-top: 8px; width: 0%; transition: width linear; }
+
     .banner {
-      margin: 0 12px; padding: 10px 12px; border-radius: 12px; background: #3b0b0b; color: #ffdddd;
-      border: 1px solid #6d2020; display: none;
+      margin: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #ffefef;
+      color: #7a1d1d;
+      border: 1px solid #e5b7b7;
+      font-weight: 700;
+      display: none;
     }
-    .meta { font-size: 12px; color: var(--muted); margin-top: 8px; word-break: break-all; }
+
+    @keyframes glassFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
+      to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+    }
   </style>
 </head>
-<body>
+<body data-theme="light">
+  <button class="theme-toggle" id="themeToggle" title="تغییر تم">🌙 تم شب</button>
+
   <header>
-    <div>
+    <img src="logo.png" class="logo" alt="HyraxBot Logo" />
+    <div class="titles">
       <div class="title">HyraxBot Mini App</div>
-      <div class="subtitle">ارتباط مستقیم با ربات و پاسخ‌دهی فوری</div>
+      <div class="subtitle">اجرای قابلیت‌ها با رابط شیشه‌ای مدرن</div>
     </div>
   </header>
 
-  <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است یا initData خالی است. لطفاً از دکمه‌ی Mini App داخل چت خصوصی ربات وارد شوید.</div>
+  <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است یا initData خالی است. لطفاً از دکمه Mini App داخل چت خصوصی باز کنید.</div>
 
-  <main id="content"></main>
+  <main class="section" id="content"></main>
 
-  <nav>
-    <div class="tab active" data-section="tests">🧪 تست‌ها</div>
-    <div class="tab" data-section="tools">🛠 ابزارها</div>
-    <div class="tab" data-section="general">📂 عمومی</div>
+  <nav class="footer">
+    <button class="footer-btn active" data-section="games">🎮 بازی‌ها</button>
+    <button class="footer-btn" data-section="tools">🛠 ابزارها</button>
+    <button class="footer-btn" data-section="general">📂 عمومی</button>
   </nav>
 
+  <div id="notify" class="notify" aria-live="polite" aria-atomic="true">
+    <div id="notifyText">درخواست ارسال شد ✅</div>
+    <div class="progress" id="notifyProgress"></div>
+  </div>
+
   <script>
+    // Theme toggle
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const current = document.body.getAttribute("data-theme") || "light";
+      const next = current === "dark" ? "light" : "dark";
+      document.body.setAttribute("data-theme", next);
+      themeToggle.textContent = next === "dark" ? "☀️ تم روز" : "🌙 تم شب";
+    });
+
+    // Notify helpers
+    let notifyTimer = null;
+    function showNotify(message, duration = 3000) {
+      const notify = document.getElementById("notify");
+      const text = document.getElementById("notifyText");
+      const progress = document.getElementById("notifyProgress");
+      text.textContent = message;
+      progress.style.transition = "none";
+      progress.style.width = "0%";
+      notify.classList.add("show");
+      requestAnimationFrame(() => {
+        progress.style.transition = `width ${duration}ms linear`;
+        progress.style.width = "100%";
+      });
+      clearTimeout(notifyTimer);
+      notifyTimer = setTimeout(hideNotify, duration);
+      notify.onclick = hideNotify;
+    }
+    function hideNotify() {
+      const notify = document.getElementById("notify");
+      const progress = document.getElementById("notifyProgress");
+      notify.classList.remove("show");
+      progress.style.transition = "none";
+      progress.style.width = "0%";
+      clearTimeout(notifyTimer);
+    }
+
+    // Data
+    const DATA = {
+      games: [
+        { title: "سنگ‌کاغذ‌قیچی", desc: "شروع بازی کلاسیک در همین گپ", cmd: "/rps" },
+        { title: "Fast Button", desc: "رقابت سرعت با دوستان", cmd: "/fastbutton" },
+        { title: "دوز (TicTacToe)", desc: "یک بازی دونفره ساده", cmd: "/tictactoe" },
+        { title: "جرأت و حقیقت", desc: "چالش گروهی جذاب", cmd: "/jorat_haqiqat" }
+      ],
+      tools: [
+        { title: "شناسه من", desc: "دریافت اطلاعات کاربری شما", cmd: "/myid" },
+        { title: "تبدیل متن به ویس", desc: "Text → Voice درجا", cmd: "/txt2voc" }
+      ],
+      general: [
+        { title: "ساعت و تاریخ", desc: "نمایش زمان و تاریخ فعلی", cmd: "/clock" },
+        { title: "راهنما", desc: "راهنمای استفاده از ربات", cmd: "/help" },
+        { title: "درباره", desc: "اطلاعات و لینک‌ها", cmd: "/about" }
+      ]
+    };
+
+    // WebApp helpers
     function getTG() {
-      try {
-        return window?.Telegram?.WebApp || null;
-      } catch (_) { return null; }
+      try { return window?.Telegram?.WebApp || null; } catch (_) { return null; }
     }
     function insideTelegram(tg) {
       return !!(tg && typeof tg.initData === "string" && tg.initData.length > 0);
     }
-    function renderSection(name) {
-      const c = document.getElementById("content");
-      c.innerHTML = "";
 
-      // Meta card: shows initData length and platform hints
+    // Render section
+    function renderSection(name) {
+      const container = document.getElementById("content");
+      container.innerHTML = "";
+
+      // Meta status card
       const meta = document.createElement("div");
       meta.className = "card";
       meta.innerHTML = `
         <h3>وضعیت اتصال</h3>
-        <p>طول initData و امکان ارسال داده به ربات را اینجا می‌بینید.</p>
-        <div class="meta" id="metaInfo"></div>
+        <p>طول initData و اطلاعات WebApp برای دیباگ سریع.</p>
+        <div class="meta" id="metaInfo" style="font-size:12px;color:var(--muted);word-break:break-all;"></div>
+        <button id="btnHello" class="btn" style="margin-top:10px;">ارسال hello</button>
       `;
-      c.appendChild(meta);
+      container.appendChild(meta);
 
-      // Test card
-      const test = document.createElement("div");
-      test.className = "card";
-      test.innerHTML = `
-        <h3>🔎 تست ارسال داده</h3>
-        <p>برای اطمینان از ارتباط Mini App با بات تلگرام، این دکمه را فشار دهید.</p>
-        <button id="btnHello" class="btn">ارسال hello</button>
-      `;
-      c.appendChild(test);
+      const items = DATA[name] || [];
+      for (const item of items) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${item.title}</h3>
+          <p>${item.desc}</p>
+          <button class="btn">اجرا</button>
+        `;
+        card.querySelector(".btn").addEventListener("click", () => sendPayload({ type: "command", payload: { command: item.cmd } }));
+        container.appendChild(card);
+      }
 
       // Custom payload card
       const custom = document.createElement("div");
       custom.className = "card";
       custom.innerHTML = `
         <h3>📦 ارسال درخواست سفارشی</h3>
-        <p>هر متنی را بفرست؛ ربات همان را پاسخ می‌دهد.</p>
-        <input id="inpCmd" placeholder="مثلاً /clock یا هر متن" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.10);color:#fff;margin-bottom:8px;">
+        <p>هر متن/دستور را بفرست؛ ربات همان را پاسخ می‌دهد.</p>
+        <input id="inpCmd" placeholder="مثلاً /clock یا هر متن" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-glass);background:rgba(255,255,255,0.10);color:var(--text);margin-bottom:8px;">
         <button id="btnSend" class="btn">ارسال</button>
       `;
-      c.appendChild(custom);
+      container.appendChild(custom);
 
-      // Section samples
-      const samples = {
-        tools: [{t:"شناسه من", d:"/myid"}, {t:"تبدیل متن به ویس", d:"/txt2voc"}],
-        general: [{t:"ساعت و تاریخ", d:"/clock"}, {t:"راهنما", d:"/help"}],
-        tests: [{t:"سنگ‌کاغذ‌قیچی", d:"/rps"}, {t:"Fast Button", d:"/fast_button"}],
+      // Wire buttons
+      const btnHello = document.getElementById("btnHello");
+      btnHello.onclick = () => sendPayload({ type: "hello", payload: "hello from miniapp" });
+
+      const btnSend = document.getElementById("btnSend");
+      btnSend.onclick = () => {
+        const v = document.getElementById("inpCmd").value.trim();
+        if (!v) return showNotify("متن یا دستور را وارد کنید.", 2000);
+        sendPayload({ type: "custom", payload: { text: v } });
       };
-      (samples[name] || []).forEach(s => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `<h3>${s.t}</h3><p>ارسال: ${s.d}</p><button class="btn">اجرا</button>`;
-        card.querySelector(".btn").onclick = () => sendPayload({type:"command", payload:{command:s.d}});
-        c.appendChild(card);
-      });
 
-      wire();
+      // Update meta info
+      updateMeta();
     }
 
+    // Footer active
+    function setActiveFooter(sectionName) {
+      document.querySelectorAll(".footer-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-section") === sectionName);
+      });
+    }
+    document.querySelectorAll(".footer-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const section = btn.getAttribute("data-section");
+        setActiveFooter(section);
+        renderSection(section);
+      });
+    });
+
+    // Payload sender
     let tg = null;
     function updateMeta() {
       const info = document.getElementById("metaInfo");
@@ -133,50 +374,31 @@
       try {
         tg = getTG();
         if (!insideTelegram(tg) || !tg?.sendData) {
-          alert("❌ WebApp API در دسترس نیست یا initData خالی است. از داخل چت خصوصی و دکمه‌ی Mini App وارد شوید.");
+          showNotify("❌ WebApp API در دسترس نیست یا initData خالی است.", 3000);
+          alert("❌ WebApp API در دسترس نیست یا initData خالی است. از دکمه Mini App در چت خصوصی وارد شوید.");
+          console.warn("[MiniApp] send aborted. tg:", tg);
           return;
         }
-        const envelope = JSON.stringify({
-          ...obj,
-          ts: Date.now(),
-          initData: tg.initData || ""
-        });
+        const envelope = JSON.stringify({ ...obj, ts: Date.now(), initData: tg.initData || "" });
         tg.sendData(envelope);
         console.log("[MiniApp] sent:", envelope);
-        alert("✅ درخواست ارسال شد");
+        showNotify("درخواست ارسال شد ✅", 2500);
       } catch (e) {
         console.error("[MiniApp] send failed:", e);
-        alert("❌ ارسال ناموفق بود");
+        showNotify("❌ ارسال ناموفق بود", 2500);
       }
     }
 
-    function wire() {
-      document.getElementById("btnHello").onclick = () => sendPayload({type:"hello", payload:"hello from miniapp"});
-      document.getElementById("btnSend").onclick = () => {
-        const v = document.getElementById("inpCmd").value.trim();
-        if (!v) return alert("متن یا دستور را وارد کنید.");
-        sendPayload({type:"custom", payload:{text:v}});
-      };
-      updateMeta();
-    }
-
+    // Boot
     document.addEventListener("DOMContentLoaded", () => {
       tg = getTG();
-      try { tg?.ready?.(); tg?.expand?.(); } catch(e) { console.warn("tg.ready/expand error:", e); }
+      try { tg?.ready?.(); tg?.expand?.(); } catch (e) { console.warn("tg.ready/expand error:", e); }
 
       const banner = document.getElementById("banner");
       banner.style.display = insideTelegram(tg) ? "none" : "block";
 
-      // tabs
-      document.querySelectorAll(".tab").forEach(el => {
-        el.onclick = () => {
-          document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-          el.classList.add("active");
-          renderSection(el.dataset.section);
-        };
-      });
-
-      renderSection("tests");
+      setActiveFooter("games");
+      renderSection("games");
     });
   </script>
 </body>
