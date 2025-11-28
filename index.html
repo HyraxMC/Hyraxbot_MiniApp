@@ -13,7 +13,7 @@
       --card-glass: rgba(255, 255, 255, 0.22);
       --border-glass: rgba(255, 255, 255, 0.28);
       --nav-glass: rgba(255, 255, 255, 0.18);
-      --bg-image: url('day-bg.jpg'); /* بک‌گراند روز */
+      --bg-image: url('day-bg.jpg');
     }
     [data-theme="dark"] {
       --bg: #0b1220;
@@ -23,7 +23,7 @@
       --card-glass: rgba(16, 20, 28, 0.45);
       --border-glass: rgba(255, 255, 255, 0.16);
       --nav-glass: rgba(255, 255, 255, 0.12);
-      --bg-image: url('night-bg.jpg'); /* بک‌گراند شب */
+      --bg-image: url('night-bg.jpg');
     }
 
     html, body { height: 100%; }
@@ -41,7 +41,6 @@
       transition: background 0.4s ease, color 0.3s ease, background-image 0.6s ease;
     }
 
-    /* هدر شیشه‌ای با لوگو */
     header {
       position: sticky;
       top: 0;
@@ -65,7 +64,6 @@
     header .title { font-weight: 800; letter-spacing: 0.2px; }
     header .subtitle { font-size: 12px; color: var(--muted); }
 
-    /* دکمه تغییر تم – شناور و بدون تداخل با هدر */
     .theme-toggle {
       position: fixed;
       inset-inline-end: 12px;
@@ -84,7 +82,6 @@
     }
     .theme-toggle:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
 
-    /* بخش محتوا */
     main.section {
       flex: 1;
       padding: 16px;
@@ -96,7 +93,6 @@
     @media (min-width: 420px) { main.section { grid-template-columns: 1fr 1fr; } }
     @media (min-width: 720px) { main.section { grid-template-columns: 1fr 1fr 1fr; } }
 
-    /* کارت‌ها با افکت Liquid Glass */
     .card {
       position: relative;
       background: var(--card-glass);
@@ -122,7 +118,6 @@
     .card h3 { margin: 0 0 10px; font-size: 15.5px; font-weight: 800; }
     .card p { margin: 0 0 12px; font-size: 12.5px; color: var(--muted); }
 
-    /* دکمه‌ها با glow و scale */
     .btn {
       display: inline-block;
       background: linear-gradient(135deg, var(--accent), #6be6ff);
@@ -139,7 +134,6 @@
     .btn:hover { transform: translateY(-1px) scale(1.04); box-shadow: 0 10px 28px rgba(0,194,255,0.45); filter: saturate(115%); }
     .btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 5px 18px rgba(0,194,255,0.35); }
 
-    /* فوتر شیشه‌ای مات */
     nav.footer {
       position: sticky;
       bottom: 0;
@@ -167,10 +161,9 @@
     .footer-btn:hover { transform: translateY(-1px) scale(1.03); background: rgba(255,255,255,0.22); }
     .footer-btn.active { background: rgba(255,255,255,0.26); box-shadow: 0 12px 34px rgba(0,0,0,0.28); }
 
-    /* نوتیفیکیشن اسلایدی با پروگرس – قرارگیری بالای فوتر */
     .notify {
       position: fixed;
-      bottom: 72px; /* بالای فوتر؛ در صورت تغییر ارتفاع فوتر این مقدار را تنظیم کن */
+      bottom: 72px;
       left: 50%;
       transform: translateX(-50%);
       width: 92%;
@@ -189,11 +182,7 @@
       opacity: 0;
       pointer-events: none;
     }
-    .notify.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
+    .notify.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     .notify .progress {
       height: 4px;
       background: var(--accent);
@@ -207,13 +196,29 @@
       from { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(2px); }
       to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
     }
+
+    .banner {
+      position: fixed;
+      top: 56px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      max-width: 480px;
+      background: #ffefef;
+      color: #7a1d1d;
+      border: 1px solid #e5b7b7;
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+      font-weight: 700;
+      z-index: 1000;
+      display: none;
+    }
   </style>
 </head>
 <body data-theme="light">
-  <!-- دکمه تغییر تم -->
   <button class="theme-toggle" id="themeToggle" title="تغییر تم">🌙 تم شب</button>
 
-  <!-- هدر -->
   <header>
     <img src="logo.png" class="logo" alt="HyraxBot Logo" />
     <div class="titles">
@@ -222,27 +227,36 @@
     </div>
   </header>
 
-  <!-- محتوا -->
   <main class="section" id="content"></main>
 
-  <!-- فوتر -->
   <nav class="footer">
     <button class="footer-btn active" data-section="games">🎮 بازی‌ها</button>
     <button class="footer-btn" data-section="tools">🛠 ابزارها</button>
     <button class="footer-btn" data-section="general">📂 عمومی</button>
   </nav>
 
-  <!-- نوتیفیکیشن بالای فوتر -->
   <div id="notify" class="notify" aria-live="polite" aria-atomic="true">
     <div id="notifyText">درخواست ارسال شد ✅</div>
     <div class="progress" id="notifyProgress"></div>
   </div>
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    tg?.expand();
+  <div id="banner" class="banner">❌ این صفحه خارج از تلگرام باز شده است. لطفاً از داخل ربات و دکمه Mini App باز کنید.</div>
 
-    // داده‌ها (Whois حذف شده)
+  <script>
+    const tg = window.Telegram?.WebApp || null;
+
+    // آماده‌سازی
+    if (tg) {
+      tg.ready && tg.ready();
+      tg.expand && tg.expand();
+      console.log("[MiniApp] Telegram WebApp ready. initData:", tg.initData || "(empty)");
+    } else {
+      console.warn("[MiniApp] Telegram WebApp not available. Probably opened in browser.");
+      const banner = document.getElementById("banner");
+      banner.style.display = "block";
+    }
+
+    // داده‌ها
     const DATA = {
       games: [
         { title: "سنگ‌کاغذ‌قیچی", desc: "شروع بازی کلاسیک در همین گپ", cmd: "/rps" },
@@ -261,10 +275,21 @@
       ]
     };
 
-    // رندر بخش‌ها
+    // رندر کارت‌ها + افزودن دکمه تست
     function renderSection(name) {
       const container = document.getElementById("content");
       container.innerHTML = "";
+
+      // دکمه تست ارسال داده (همیشه اول لیست)
+      const testCard = document.createElement("div");
+      testCard.className = "card";
+      testCard.innerHTML = `
+        <h3>🔎 تست ارسال داده</h3>
+        <p>برای اطمینان از ارتباط Mini App با بات تلگرام، این دکمه را فشار دهید.</p>
+        <button id="testBtn" class="btn">ارسال hello</button>
+      `;
+      container.appendChild(testCard);
+
       const items = DATA[name] || [];
       for (const item of items) {
         const card = document.createElement("div");
@@ -277,6 +302,23 @@
         card.querySelector(".btn").addEventListener("click", () => exec(name, item.cmd));
         container.appendChild(card);
       }
+
+      // اتصال دکمه تست
+      const btn = document.getElementById("testBtn");
+      btn.addEventListener("click", () => {
+        if (!tg || !tg.sendData) {
+          alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+          return;
+        }
+        try {
+          tg.sendData("hello from miniapp");
+          showNotify("داده تست ارسال شد ✅", 2500);
+          console.log("[MiniApp] Test data sent.");
+        } catch (err) {
+          console.error("[MiniApp] sendData failed:", err);
+          showNotify("❌ ارسال تست ناموفق بود", 2500);
+        }
+      });
     }
 
     // فوتر فعال
@@ -302,7 +344,7 @@
       themeToggle.textContent = next === "dark" ? "☀️ تم روز" : "🌙 تم شب";
     });
 
-    // نوتیفیکیشن بالای فوتر با پروگرس و کشیدن برای بستن
+    // نوتیفیکیشن
     let notifyTimer = null;
     function showNotify(message, duration = 3000) {
       const notify = document.getElementById("notify");
@@ -334,7 +376,7 @@
       notify.addEventListener("touchstart", touchStart, { passive: true });
       notify.addEventListener("touchmove", touchMove, { passive: true });
 
-      // کلیک برای بستن (دسکتاپ)
+      // کلیک برای بستن
       notify.onclick = hideNotify;
     }
     function hideNotify() {
@@ -346,11 +388,21 @@
       clearTimeout(notifyTimer);
     }
 
-    // ارسال درخواست به بات؛ فقط نوتیفیکیشن خلاصه نمایش داده می‌شود
+    // ارسال فرمان اجرا
     function exec(section, command) {
-      const payload = { type: "exec", section, command, initData: tg?.initData || "" };
-      tg?.sendData?.(JSON.stringify(payload));
-      showNotify("درخواست ارسال شد ✅", 3500);
+      if (!tg || !tg.sendData) {
+        alert("❌ WebApp API در دسترس نیست. باید داخل تلگرام باز شود.");
+        return;
+      }
+      const payload = { type: "exec", section, command, initData: tg.initData || "" };
+      try {
+        tg.sendData(JSON.stringify(payload));
+        showNotify("درخواست ارسال شد ✅", 3500);
+        console.log("[MiniApp] exec sent:", payload);
+      } catch (err) {
+        console.error("[MiniApp] exec send failed:", err);
+        showNotify("❌ ارسال درخواست ناموفق بود", 3000);
+      }
     }
 
     // راه‌اندازی اولیه
